@@ -68,4 +68,30 @@ placeCtrl.getUserPlaces = async (req, res) => {
   }
 };
 
+placeCtrl.deletePlace = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await Place.findById(id);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'The place id does not exist',
+    });
+  }
+
+  try {
+    await Place.findByIdAndDelete(id);
+    res.json({
+      sucess: true,
+      message: 'Place deleted',
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error,
+    });
+  }
+};
+
 module.exports = placeCtrl;
