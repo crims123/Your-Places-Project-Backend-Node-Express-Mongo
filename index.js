@@ -12,6 +12,7 @@ app.use(cors());
 
 // Routes
 app.use('/api/users', require('./routes/users'));
+app.use('/api/places', require('./routes/places'));
 
 app.listen(port, '0.0.0.0', () => {
   console.log('Server running at port: ' + port);
