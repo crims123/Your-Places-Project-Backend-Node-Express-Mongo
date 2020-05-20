@@ -28,7 +28,24 @@ placeCtrl.createPlace = async (req, res) => {
       message: error
     });
   }
- 
 };
+
+placeCtrl.getPlaceById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+   const place =  await Place.findById(id);
+   res.json({
+    sucess: true,
+    message: 'Place by id',
+    data: place
+  })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error
+    });
+  }
+}
 
 module.exports = placeCtrl;
