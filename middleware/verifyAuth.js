@@ -2,7 +2,8 @@ const jwt = require('jsonwebtoken');
 
 const verifyAuth = (req, res, next) => {
   try {
-    jwt.verify(req.headers.authorization, process.env.SECRET);
+    const verifyUser= jwt.verify(req.headers.authorization, process.env.SECRET);
+    req.userLoggedId = verifyUser.user.id;
     next();
   } catch {
     res.status(404).json({
