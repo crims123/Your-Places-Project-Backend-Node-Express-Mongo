@@ -5,7 +5,7 @@ const User = require('../models/User');
 
 userCtrl.addUser = async (req, res) => {
   try {
-    const { name, email, password, register } = req.body;
+    const { name, email, password } = req.body;
 
     const uniqueEmail = await User.findOne({ email });
 
@@ -20,7 +20,6 @@ userCtrl.addUser = async (req, res) => {
       name,
       email,
       password,
-      register,
     });
 
     // Hash Password
@@ -44,7 +43,7 @@ userCtrl.addUser = async (req, res) => {
         res.json({
           success: true,
           message: 'User created',
-          data: { token },
+          data: token,
         });
       }
     );
