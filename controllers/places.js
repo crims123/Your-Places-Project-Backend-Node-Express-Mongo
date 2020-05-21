@@ -1,4 +1,5 @@
 const Place = require('../models/Place');
+const User = require('../models/User');
 const { validationResult } = require('express-validator');
 const placeCtrl = {};
 
@@ -37,21 +38,33 @@ placeCtrl.createPlace = async (req, res) => {
     });
   }
 
-  const place = new Place({
-    title,
-    description,
-    image:
-      'https://worldstrides.com/wp-content/uploads/2015/07/iStock_000040849990_Large.jpg',
-    address,
-    location: {
-      lat: 21,
-      lng: 23,
-    },
-    creator: userLoggedId,
-  });
-
   try {
+    const place = new Place({
+      title,
+      description,
+      image:
+        'https://worldstrides.com/wp-content/uploads/2015/07/iStock_000040849990_Large.jpg',
+      address,
+      location: {
+        lat: 21,
+        lng: 23,
+      },
+      creator: userLoggedId,
+    });
+
+    const user = await User.findById(userLoggedId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Could not find user for provided id.',
+      });
+    }
+
     await place.save();
+    user.places.push(place);
+    await user.save();
+
     res.status(201).json({
       sucess: true,
       message: 'Place created',
