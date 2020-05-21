@@ -82,6 +82,14 @@ placeCtrl.getPlaceById = async (req, res) => {
 
   try {
     const place = await Place.findById(id);
+
+    if (!place) {
+      res.status(404).json({
+        success: false,
+        message: 'Could not find place for the provided id.',
+      });
+    }
+
     res.json({
       sucess: true,
       message: 'Place by id',
@@ -93,13 +101,6 @@ placeCtrl.getPlaceById = async (req, res) => {
       message: 'Something went wrong, could not find a place.',
     });
   }
-
-  if (!place) {
-    res.status(404).json({
-      success: false,
-      message: 'Could not find place for the provided id.',
-    });
-  }
 };
 
 placeCtrl.getUserPlaces = async (req, res) => {
@@ -107,6 +108,13 @@ placeCtrl.getUserPlaces = async (req, res) => {
 
   try {
     const userPlaces = await Place.find({ creator: userLoggedId });
+    if (!userPlaces.length) {
+      res.status(404).json({
+        success: false,
+        message: 'There are not places for the provided user.',
+      });
+    }
+
     res.json({
       sucess: true,
       message: 'User Places',
@@ -184,10 +192,28 @@ placeCtrl.deletePlace = async (req, res) => {
       });
     }
 
-    if (place.creator !== userLoggedId) {
+    if (String(place.creator) !== String(userLoggedId)) {
       res.status(401).json({
         success: false,
         message: 'You are not allowed to delete this place.',
+      });
+    }
+
+    try {
+      const user = await User.findById(userLoggedId);
+      if (!user) {
+        res.status(404).json({
+          success: false,
+          message: 'Could not find user for delete place.',
+        });
+      }
+
+      user.places.pull(place);
+      await user.save();
+    } catch (error) {
+      res.status(401).json({
+        success: false,
+        message: 'We could not delete place from user.',
       });
     }
 
