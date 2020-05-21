@@ -8,9 +8,8 @@ userCtrl.addUser = async (req, res) => {
     const { name, email, password } = req.body;
 
     const uniqueEmail = await User.findOne({ email });
-
     if (uniqueEmail) {
-      return res.status(400).json({
+      return res.status(403).json({
         success: false,
         message: 'Email has already been registered',
       });
@@ -20,6 +19,8 @@ userCtrl.addUser = async (req, res) => {
       name,
       email,
       password,
+      image: 'imagetest',
+      places: []
     });
 
     // Hash Password
@@ -48,9 +49,9 @@ userCtrl.addUser = async (req, res) => {
       }
     );
   } catch (error) {
-    res.status(400).json({
+    res.status(500).json({
       success: false,
-      message: error,
+      message: 'Logging in failed, please try again later.',
     });
   }
 };
@@ -58,19 +59,18 @@ userCtrl.addUser = async (req, res) => {
 userCtrl.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
 
+    const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({
+      return res.status(403).json({
         success: false,
         message: 'Incorrect Email',
       });
     }
 
     const checkPassword = await bcryptjs.compare(password, user.password);
-
     if (!checkPassword) {
-      return res.status(400).json({
+      return res.status(403).json({
         success: false,
         message: 'Incorrect password',
       });
@@ -90,34 +90,14 @@ userCtrl.login = async (req, res) => {
         res.json({
           success: true,
           message: 'User Authenticated',
-          data: { token },
+          data: token,
         });
       }
     );
   } catch (error) {
-    res.status(400).json({
+    res.status(500).json({
       success: false,
-      message: error,
-    });
-  }
-};
-
-userCtrl.getUser = async (req, res) => {
-  try {
-    const {
-      user: { id },
-    } = jwt.verify(req.headers.authorization, process.env.SECRET);
-    const user = await User.findById(id).select('-password');
-
-    res.json({
-      success: true,
-      message: 'User Data',
-      user,
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: error,
+      message: 'Logging in failed, please try again later.',
     });
   }
 };
