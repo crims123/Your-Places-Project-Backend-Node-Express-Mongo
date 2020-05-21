@@ -126,13 +126,6 @@ placeCtrl.getUserPlaces = async (req, res) => {
       message: 'Fetching places failed, please try again later.',
     });
   }
-
-  if (!userPlaces.length) {
-    res.status(404).json({
-      success: false,
-      message: 'Could not find places for the provided user id.',
-    });
-  }
 };
 
 placeCtrl.updatePlace = async (req, res) => {
@@ -158,7 +151,7 @@ placeCtrl.updatePlace = async (req, res) => {
       });
     }
 
-    if (place.creator !== userLoggedId) {
+    if (String(place.creator) !== String(userLoggedId)) {
       res.status(401).json({
         success: false,
         message: 'You are not allowed to edit this place',
