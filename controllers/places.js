@@ -177,14 +177,7 @@ placeCtrl.deletePlace = async (req, res) => {
         message: 'You are not allowed to delete this place.',
       });
     }
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Something went wrong, could not delete place.',
-    });
-  }
 
-  try {
     await Place.findByIdAndDelete(id);
     res.json({
       sucess: true,
