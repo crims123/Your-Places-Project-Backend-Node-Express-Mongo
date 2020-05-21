@@ -102,4 +102,20 @@ userCtrl.login = async (req, res) => {
   }
 };
 
+userCtrl.getUsers = async(req, res) => {
+  try {
+    users = await User.find({}, '-password')
+    res.json({
+      success: true,
+      message: 'Users',
+      data: users
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Fetching users failed, please try again later.'
+    })
+  }
+}
+
 module.exports = userCtrl;

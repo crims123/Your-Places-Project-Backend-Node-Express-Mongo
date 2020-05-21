@@ -1,10 +1,10 @@
 const { Router } = require('express');
-const { addUser, login, getUser } = require('../controllers/users');
+const { addUser, login, getUsers } = require('../controllers/users');
 const verifyAuth = require('../middleware/verifyAuth');
 
 const router = Router();
 
-router.route('/').post(addUser).get(verifyAuth, getUser);
+router.route('/').post(addUser).get(getUsers);
 
 router.route('/login').post(login);
 
