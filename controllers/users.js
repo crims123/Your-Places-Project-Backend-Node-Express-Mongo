@@ -20,7 +20,7 @@ userCtrl.addUser = async (req, res) => {
       email,
       password,
       image: 'imagetest',
-      places: []
+      places: [],
     });
 
     // Hash Password
@@ -44,7 +44,10 @@ userCtrl.addUser = async (req, res) => {
         res.json({
           success: true,
           message: 'User created',
-          data: token,
+          data: {
+            token,
+            userId: user._id,
+          },
         });
       }
     );
@@ -90,7 +93,10 @@ userCtrl.login = async (req, res) => {
         res.json({
           success: true,
           message: 'User Authenticated',
-          data: token,
+          data: {
+            token,
+            userId: user._id,
+          },
         });
       }
     );
@@ -102,20 +108,20 @@ userCtrl.login = async (req, res) => {
   }
 };
 
-userCtrl.getUsers = async(req, res) => {
+userCtrl.getUsers = async (req, res) => {
   try {
-    users = await User.find({}, '-password')
+    users = await User.find({}, '-password');
     res.json({
       success: true,
       message: 'Users',
-      data: users
-    })
+      data: users,
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Fetching users failed, please try again later.'
-    })
+      message: 'Fetching users failed, please try again later.',
+    });
   }
-}
+};
 
 module.exports = userCtrl;
