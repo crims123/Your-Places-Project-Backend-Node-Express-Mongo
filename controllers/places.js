@@ -26,7 +26,6 @@ placeCtrl.createPlace = async (req, res) => {
         message: 'A place with same address already exist',
       });
     }
-
   } catch (error) {
     deleteFile(req.file);
     res.status(500).json({
@@ -202,6 +201,9 @@ placeCtrl.deletePlace = async (req, res) => {
     }
 
     await Place.findByIdAndDelete(id);
+    const file = { path: place.image };
+    deleteFile(file);
+
     res.json({
       sucess: true,
       message: 'Place deleted',
