@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const bcryptjs = require('bcryptjs');
-const fs = require('fs');
+const deleteFile = require('../utils/deleteFile');
 const userCtrl = {};
 const User = require('../models/User');
 
@@ -10,12 +10,7 @@ userCtrl.addUser = async (req, res) => {
 
     const uniqueEmail = await User.findOne({ email });
     if (uniqueEmail) {
-      if (req.file) {
-        fs.unlink(req.file.path, (error) => {
-          console.log(error);
-        });
-      }
-
+      deleteFile(req.file);
       return res.status(403).json({
         success: false,
         message: 'Email has already been registered',
@@ -61,6 +56,7 @@ userCtrl.addUser = async (req, res) => {
       }
     );
   } catch (error) {
+    deleteFile(req.file);
     res.status(500).json({
       success: false,
       message: 'Logging in failed, please try again later.',
