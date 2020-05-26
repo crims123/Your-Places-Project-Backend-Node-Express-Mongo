@@ -103,18 +103,11 @@ placeCtrl.getPlaceById = async (req, res) => {
   }
 };
 
-placeCtrl.getUserPlaces = async (req, res) => {
-  const { userLoggedId } = req;
+placeCtrl.getPlacesByUserId = async (req, res) => {
+  const { id } = req.params;
 
   try {
-    const userPlaces = await Place.find({ creator: userLoggedId });
-    if (!userPlaces.length) {
-      res.status(404).json({
-        success: false,
-        message: 'There are not places for the provided user.',
-      });
-    }
-
+    const userPlaces = await Place.find({ creator: id });
     res.json({
       sucess: true,
       message: 'User Places',
