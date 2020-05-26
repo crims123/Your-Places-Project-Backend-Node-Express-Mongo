@@ -1,11 +1,13 @@
 const Place = require('../models/Place');
 const User = require('../models/User');
+const deleteFile = require('../utils/deleteFile');
 const { validationResult } = require('express-validator');
 const placeCtrl = {};
 
 placeCtrl.createPlace = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+    deleteFile(req.file);
     res.status(422).json({
       success: false,
       message: 'Invalid inputs passed, please check your data',
@@ -18,20 +20,15 @@ placeCtrl.createPlace = async (req, res) => {
   try {
     const uniqueAddress = await Place.find({ address: address });
     if (uniqueAddress.length) {
+      deleteFile(req.file);
       return res.status(422).json({
         success: false,
         message: 'A place with same address already exist',
       });
     }
 
-    const uniqueTitle = await Place.find({ title: title });
-    if (uniqueTitle.length) {
-      return res.status(422).json({
-        success: false,
-        message: 'A place with same title already exist',
-      });
-    }
   } catch (error) {
+    deleteFile(req.file);
     res.status(500).json({
       success: false,
       message: 'Fetching place failed, please try again.',
@@ -42,8 +39,7 @@ placeCtrl.createPlace = async (req, res) => {
     const place = new Place({
       title,
       description,
-      image:
-        'https://worldstrides.com/wp-content/uploads/2015/07/iStock_000040849990_Large.jpg',
+      image: req.file.path,
       address,
       location: {
         lat: 21,
@@ -55,6 +51,7 @@ placeCtrl.createPlace = async (req, res) => {
     const user = await User.findById(userLoggedId);
 
     if (!user) {
+      deleteFile(req.file);
       return res.status(404).json({
         success: false,
         message: 'Could not find user for provided id.',
@@ -70,6 +67,7 @@ placeCtrl.createPlace = async (req, res) => {
       message: 'Place created',
     });
   } catch (error) {
+    deleteFile(req.file);
     res.status(500).json({
       success: false,
       message: 'Creating place failed, please try again.',

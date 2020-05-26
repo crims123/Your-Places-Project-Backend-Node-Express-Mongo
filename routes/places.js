@@ -7,10 +7,11 @@ const {
   deletePlace,
 } = require('../controllers/places');
 const verifyAuth = require('../middleware/verifyAuth');
+const fileUpload = require('../middleware/fileUpload');
 
 const router = Router();
 
-router.route('/').post(verifyAuth, createPlace);
+router.route('/').post(verifyAuth, fileUpload.single('image'), createPlace);
 
 router
   .route('/:id')
