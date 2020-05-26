@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const bcryptjs = require('bcryptjs');
+const fs = require('fs');
 const userCtrl = {};
 const User = require('../models/User');
 
@@ -9,17 +10,25 @@ userCtrl.addUser = async (req, res) => {
 
     const uniqueEmail = await User.findOne({ email });
     if (uniqueEmail) {
+      if (req.file) {
+        fs.unlink(req.file.path, (error) => {
+          console.log(error);
+        });
+      }
+
       return res.status(403).json({
         success: false,
         message: 'Email has already been registered',
       });
     }
 
+    process.env.PORT || 4000;
+
     const user = new User({
       name,
       email,
       password,
-      image: 'imagetest',
+      image: req.file.path,
       places: [],
     });
 
