@@ -1,7 +1,8 @@
 const Place = require('../models/Place');
 const User = require('../models/User');
-const deleteFile = require('../utils/deleteFile');
 const { validationResult } = require('express-validator');
+const deleteFile = require('../utils/deleteFile');
+const getCoordsForAddress = require('../utils/location');
 const placeCtrl = {};
 
 placeCtrl.createPlace = async (req, res) => {
@@ -34,6 +35,27 @@ placeCtrl.createPlace = async (req, res) => {
     });
   }
 
+  let coordinates;
+  try {
+    const data = await getCoordsForAddress(address);
+
+    if (!data || data.status === 'ZERO_RESULTS') {
+      deleteFile(req.file);
+      return res.status(404).json({
+        success: false,
+        message: 'Could not find coordinates for the specified address.',
+      });
+    }
+
+    coordinates = data.features[0].center;
+  } catch (error) {
+    deleteFile(req.file);
+    return res.status(500).json({
+      success: false,
+      message: 'Could not fetch address coordinates.',
+    });
+  }
+
   try {
     const place = new Place({
       title,
@@ -41,8 +63,8 @@ placeCtrl.createPlace = async (req, res) => {
       image: req.file.path,
       address,
       location: {
-        lat: 21,
-        lng: 23,
+        lat: coordinates[0],
+        lng: coordinates[1],
       },
       creator: userLoggedId,
     });
